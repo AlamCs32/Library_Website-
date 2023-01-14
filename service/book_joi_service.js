@@ -23,7 +23,7 @@ class Book_Joi {
 
     static book_update_details(req) {
         let schema = joi.object({
-            bookId: joi.number().required(),
+            bookId: joi.number().required().messages({ 'any.required': 'book id is required' }),
             title: joi.string(),
             author: joi.string(),
             publish_date: joi.date(),
@@ -34,6 +34,17 @@ class Book_Joi {
             quantity: joi.number(),
             review: joi.string(),
         })
+        let { error } = schema.validate(req, { abortEarly: false })
+        if (error) {
+            return error
+        }
+        return false
+    }
+    static bookId_joi(req) {
+        let schema = joi.object({
+            book_id: joi.number().required().messages({ 'any.required': 'book id is required' })
+        })
+
         let { error } = schema.validate(req, { abortEarly: false })
         if (error) {
             return error

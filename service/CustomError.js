@@ -15,6 +15,11 @@ class CustomError extends Error {
     static PasswordIncorrect(message = "email or password is incorrect", status = 400) {
         return new CustomError(message, status)
     }
-
+    static No_Book(message = "No Book Found", status = 400) {
+        return new CustomError(message, status)
+    }
+    static Book_Present(message = "Book is present ", status = 200) {
+        return new CustomError(message, status)
+    }
 }
 module.exports = CustomError

@@ -45,7 +45,7 @@ class UserController {
     static async login(req, res, next) {
         let valid = login_joi(req.body)
         if (valid) {
-            return next(AllField("All fields are required"))
+            return next(valid)
         }
         let user = await User.findOne({ where: { email: req.body.email } })
         if (!user) { return next(UserExist("user is not present pls singup")) }
@@ -73,10 +73,10 @@ class UserController {
             return next(PasswordIncorrect("Invalid Password"))
         }
 
-        await User.update({ password: req.body.new_password }, { where: { id: user.id }, individualHooks: true }).catch(error => {
+        let result = await User.update({ password: req.body.new_password }, { where: { id: user.id }, individualHooks: true }).catch(error => {
             return next(error)
         })
-        return res.status(200).send({ status: "success", message: "password changed successfully" })
+        return res.status(200).send({ status: "success", data: result })
 
     }
 
@@ -126,7 +126,7 @@ class UserController {
             let passwdReset = await User.update({ password }, { where: { id: user.id }, individualHooks: true })
                 .catch(error => { return next(error) })
 
-            return res.status(200).json({ status: true, passwdReset })
+            return res.status(200).json({ status: true, data: passwdReset })
         } catch (error) {
             return next(error)
         }

@@ -1,6 +1,9 @@
 const { sequelize, Model, DataTypes } = require('../config/dbConfig')
 const { User } = require('./user')
 const { Book } = require('./book')
+let moment = require('moment')
+
+let apply_Date = moment().format('YYYY-MM-DD')
 
 class User_Book extends Model { }
 
@@ -18,15 +21,32 @@ User_Book.init({
     },
     status: {
         type: DataTypes.INTEGER,
-        defaultValue: 0
+        defaultValue: 0,
+        validate: {
+            isNumeric: true,
+        }
     },
-    // return_date:{
-    //     type:DataTypes.DATE,
-    //     // defaultValue:
-    // },
+    apply_date: {
+        type: DataTypes.STRING,
+        defaultValue: apply_Date
+    },
+    return_date: {
+        type: DataTypes.STRING,
+    },
+    actual_return_date: {
+        type: DataTypes.STRING
+    },
+    fine: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    fine_pay: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
     updatedBy: {
         type: DataTypes.INTEGER
-    }
+    },
 }, {
     sequelize,
     tableName: "User_Book",
