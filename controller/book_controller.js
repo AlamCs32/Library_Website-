@@ -1,8 +1,9 @@
 const Joi = require('joi')
 const image_upload = require('../config/multer')
-const { Book, User_Book, User, UserInfo } = require('../model')
+const { Book, User_Book, UserInfo } = require('../model')
 const { book_add_joi, book_update_details, bookId_joi } = require('../service/book_joi_service')
 const moment = require('moment')
+require('dotenv').config()
 const { No_Book } = require('../service/CustomError')
 const { Op } = require('sequelize')
 
@@ -116,10 +117,11 @@ class Book_Control {
         book = book.map(i => {
             i.category = i.category.replace(/'/g, "")
             i.category = JSON.parse(i.category)
+            i.image = `http://localhost:${process.env.PORT}${i.image}`
             return i
         })
 
-        return res.status(400).send({ data: book })
+        return res.status(200).send({ data: book })
     }
 
     // @user
@@ -138,20 +140,21 @@ class Book_Control {
             return next(No_Book())
         }
 
-        if (book.quantity == 0) {
+        if (book.quantity === 0) {
             return res.status(200).send({ data: book, messages: "out of stock" })
         }
-        let user_fine = await User_Book.findOne({ where: { user_id: req.user.id, fine: true } }).catch(error => {
-            return next(error)
-        })
+
+        let user_fine = await User_Book.findOne({ where: { user_id: req.user.id, fine: { [Op.gt]: 0 } } })
+            .catch(error => { return next(error) })
 
         if (user_fine) {
-            return res.status(200).send({ data: `Pay fine ${user_fine.fine_pay}` })
+            return res.status(200).send({ data: `Pay fine ${user_fine.fine}` })
         }
 
         let book_user = await User_Book.findOne({ where: { book_id: req.body.book_id, user_id: req.user.id, status: 0 } }).catch(error => {
             return next(error)
         })
+
         if (book_user) {
             return res.status(200).send({ data: book_user })
         }
@@ -165,7 +168,7 @@ class Book_Control {
         return res.status(200).send({ data: book_user })
     }
     // @admin
-    // Admin User Book Request Confirm 
+    // Admin User Book Request Confirm / Reject
     static async admin_book_request(req, res, next) {
         let schema = Joi.object({
             id: Joi.number().required().messages({ 'any.required': 'id is required' }),
@@ -299,14 +302,32 @@ class Book_Control {
         return res.status(200).send({ data: { book, result: user_book } })
     }
     // @admin
-    // admin update fine payment 
+    // admin update fine payment / user pay the fine ammount this function will updated the user fine 
     static async admin_update_fine_payment(req, res, next) {
-        return res.status(200).send("admin_update_fine_payment")
+        let schema = Joi.object({
+            user_id: Joi.number().required()
+        })
+        let { error } = schema.validate(req.params, { abortEarly: false })
+        if (error) { return next(error) }
+
+        let user = await User_Book.findOne({ where: { fine: { [Op.gt]: 0 }, user_id: req.params.user_id } }).catch(error => {
+            return next(error)
+        })
+
+        if (!user) {
+            return res.status(200).send("Fine is Paid No Fine")
+        }
+        let userFineUpdated = await User_Book.update({ fine_pay: true, fine: 0 }, { where: { id: user.id } }).catch(error => {
+            return next(error)
+        })
+
+        return res.status(200).send(userFineUpdated)
     }
     // @admin
     // admin user fine list 
     static async admin_all_user_fine_list(req, res, next) {
         let offset = req.query.page ? (req.query.page - 1) * 10 : 0;
+
         let data = await User_Book.findAll({ where: { fine: { [Op.gt]: 0 } }, limit: 10, offset, order: [['id', 'DESC']] }).catch(error => {
             return next(error)
         })
@@ -321,23 +342,32 @@ class Book_Control {
         let { error } = schema.validate(req.params)
         if (error) { return next(error) }
 
-        let user = await User_Book.findAll({ where: { fine: { [Op.gt]: 0 }, user_id: req.params.user_id }, include: { model: User, attributes: { exclude: ['password', "role", "createdAt", "updatedAt"] } } }).catch(error => {
+        let user = await User_Book.findOne({ where: { fine: { [Op.gt]: 0 }, user_id: req.params.user_id } }).catch(error => {
             return next(error)
         })
+
+        if (!user) {
+            return res.status(200).send("user have no fine")
+        }
 
         let user_info = await UserInfo.findOne({ where: { id: req.params.user_id }, attributes: { exclude: ["createdAt", "updatedAt"] } }).catch(error => {
             return next(error)
         })
-        user = { ...user, user_info }
 
-        return res.status(200).send({ data: user })
+        return res.status(200).send([user, user_info])
     }
 
     // @user
     // user all fine list and total fine ammount   
-    // static async admin_user_fine(req, res, next) {
-    //     return res.status(200).send("admin_user_fine")
-    // }
+    static async user_fine(req, res, next) {
+        let user = await User_Book.findOne({ where: { fine: { [Op.gt]: 0, user_id: req.user.id } } }).catch(error => {
+            return next(error)
+        })
+        if (!user) {
+            return res.status(200).send("No Fine")
+        }
+        return res.status(200).send(user)
+    }
 }
 
 module.exports = Book_Control

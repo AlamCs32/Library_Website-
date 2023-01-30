@@ -51,6 +51,6 @@ class Book_Joi {
         }
         return false
     }
-
+    // static userId_ 
 }
 module.exports = Book_Joi

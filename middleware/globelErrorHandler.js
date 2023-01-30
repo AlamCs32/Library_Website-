@@ -6,14 +6,17 @@ let errorHandler = async (error, req, res, next) => {
 
     let error_message = {
         status: "fail",
-        code:500,
+        code: 500,
         message: "internal server error",
         ...(DebugMod === "true" && { originalError: error.message })
-    }
 
+    }
     if (error instanceof ValidationError) {
+        console.log({ step: 2, error })
         error_message.code = 400
+        console.log(error)
         error_message.message = error.details.map(i => { return i.message })
+        console.log(error_message)
     }
 
     if (error instanceof CustomError) {

@@ -47,9 +47,10 @@ class UserController {
         if (valid) {
             return next(valid)
         }
-        let user = await User.findOne({ where: { email: req.body.email } })
+        let user = await User.findOne({ where: { email: req.body.email } }).catch(error => {
+            return next
+        })
         if (!user) { return next(UserExist("user is not present pls singup")) }
-
         let matchPWD = await bcrypt.compare(req.body.password, user.password)
 
         if (!matchPWD) {

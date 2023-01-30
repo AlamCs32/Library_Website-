@@ -37,8 +37,8 @@ User_Book.init({
         type: DataTypes.STRING
     },
     fine: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+        type: DataTypes.NUMBER,
+        defaultValue: 0
     },
     fine_pay: {
         type: DataTypes.BOOLEAN,
