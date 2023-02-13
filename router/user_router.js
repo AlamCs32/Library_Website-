@@ -1,5 +1,5 @@
 const express = require('express')
-const { singup, login, ChangePwd, SendEmail, forgetPasswdset } = require('../controller/userController')
+const { singup, login, ChangePwd, SendEmail, forgetPasswdset, Profile } = require('../controller/userController')
 const auth = require('../middleware/auth')
 const isAuthorize = require('../middleware/role')
 const router = express.Router()
@@ -13,6 +13,7 @@ router.post('/changepassword', auth, ChangePwd)
 router.post('/resetpass', SendEmail)
 //@both
 router.post('/reset/:id/:token', forgetPasswdset)
-
+// @both
+router.get('/profile',auth,Profile)
 
 module.exports = router

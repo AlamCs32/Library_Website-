@@ -132,5 +132,20 @@ class UserController {
             return next(error)
         }
     }
+
+    // User Profile 
+    static async Profile(req, res, next) {
+        try {
+            let user = await User.findOne({ where: { id: req.user.id }, attributes: { exclude: ["password", 'createdAt', 'updatedAt'] }, raw: true })
+
+            let userInfo = await UserInfo.findOne({ where: { user_id: user.id }, raw: true, attributes: { exclude: ["user_id", 'createdAt', 'updatedAt'] } })
+
+            user = { ...user, userInfo }
+            return res.status(200).send(user)
+
+        } catch (error) {
+            return next(error)
+        }
+    }
 }
 module.exports = UserController
