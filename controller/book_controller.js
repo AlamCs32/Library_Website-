@@ -117,7 +117,7 @@ class Book_Control {
         book = book.map(i => {
             i.category = i.category.replace(/'/g, "")
             i.category = JSON.parse(i.category)
-            i.image = `http://localhost:${process.env.PORT}${i.image}`
+            i.image = `http://localhost:${process.env.PORT}/${i.image}`
             return i
         })
 

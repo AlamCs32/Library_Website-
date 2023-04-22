@@ -42,7 +42,7 @@ router.get('/admin/fine/:user_id', auth, isAuthorize(permission), admin_user_fin
 // Fine paid Api 
 router.post('/admin/fine/paid/:user_id', auth, isAuthorize(permission), admin_update_fine_payment)
 // @user
-router.get('/user/fine',auth,user_fine)
+router.get('/user/fine', auth, user_fine)
 
 
 module.exports = router

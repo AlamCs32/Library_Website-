@@ -65,9 +65,8 @@ class Joi_service {
             email: joi.string().email().min(1).required()
         })
         let { error } = Schema.validate(req.body, { abortEarly: false })
-        if (error) {
-            return error = error.details.map(i => { return i.message })
-        }
+
+        return error ? error : false;
     }
 }
 
