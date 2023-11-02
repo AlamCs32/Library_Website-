@@ -18,6 +18,7 @@ class UserController {
         if (valid) {
             return next(CustomError.AllField(valid.message))
         }
+        console.log(req.body)
         let t = await sequelize.transaction()
         let user = await User.findOne({ where: { email: req.body.email } })
 
@@ -30,16 +31,19 @@ class UserController {
         })
 
         req.body.user_id = user.id
-        req.body.year_stream = Date.now()
 
-        let user_info = await UserInfo.create(req.body, { transaction: t }).catch(async error => {
+        await UserInfo.create(req.body, { transaction: t }).catch(async error => {
             await t.rollback().then(() => {
                 return next(error)
             })
         })
+        // Pushing Data
         await t.commit()
+        // Creating Token
         let token = sing({ userId: user.id })
-        return res.status(200).cookie('jwt', token).setHeader("authorization", `Bearer ${token}`).send({ status: "success", token })
+        console.log(user)
+        // Sending response
+        return res.status(200).send({ status: "success", token, user })
     }
 
     static async login(req, res, next) {
@@ -56,8 +60,9 @@ class UserController {
         if (!matchPWD) {
             return next(PasswordIncorrect())
         }
+
         let token = sing({ userId: user.id })
-        return res.cookie('jwt', token).setHeader("authorization", `Bearer ${token}`).status(200).send({ status: "success", token })
+        return res.status(200).send({ status: "success", user, token, user })
     }
 
     static async ChangePwd(req, res, next) {
@@ -96,7 +101,7 @@ class UserController {
         let token = sing({ userId: user.id }, secret)
 
         const link = `http://127.0.0.1:3000/reset/${user.id}/${token}`
-
+        console.log(link)
         //  sending Email Pending
         // sendMail(user.email, "Change Password", link)
         return res.status(200).send(link)
@@ -148,4 +153,5 @@ class UserController {
         }
     }
 }
+
 module.exports = UserController

@@ -12,7 +12,7 @@ class Book_Joi {
             total_page: joi.number().required().messages({ 'any.required': "total page is required" }),
             volume: joi.string().required().messages({ 'any.required': "volume is required" }),
             quantity: joi.number().required().messages({ 'any.required': "quantity is required" }),
-            review: joi.string().required().messages({ 'any.required': "review is required" }),
+            description: joi.string().required().messages({ 'any.required': "description is required" }),
         })
         let { error } = schema.validate(req, { abortEarly: false })
         if (error) {
@@ -32,7 +32,7 @@ class Book_Joi {
             total_page: joi.number(),
             volume: joi.string(),
             quantity: joi.number(),
-            review: joi.string(),
+            description: joi.string(),
         })
         let { error } = schema.validate(req, { abortEarly: false })
         if (error) {

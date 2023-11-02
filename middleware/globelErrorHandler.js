@@ -14,9 +14,7 @@ let errorHandler = async (error, req, res, next) => {
     if (error instanceof ValidationError) {
         console.log({ step: 2, error })
         error_message.code = 400
-        console.log(error)
         error_message.message = error.details.map(i => { return i.message })
-        console.log(error_message)
     }
 
     if (error instanceof CustomError) {
@@ -24,6 +22,6 @@ let errorHandler = async (error, req, res, next) => {
         error_message.message = error.message
     }
 
-    return res.status(error_message.code).send({ error: error_message })
+    return res.status(error_message.code).json({ status: "fail", error: error_message })
 }
 module.exports = errorHandler

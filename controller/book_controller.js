@@ -5,7 +5,8 @@ const { book_add_joi, book_update_details, bookId_joi } = require('../service/bo
 const moment = require('moment')
 require('dotenv').config()
 const { No_Book } = require('../service/CustomError')
-const { Op } = require('sequelize')
+const { Op, QueryTypes } = require('sequelize')
+const { sequelize } = require('../config/dbConfig')
 
 class Book_Control {
 
@@ -122,6 +123,35 @@ class Book_Control {
         })
 
         return res.status(200).send({ data: book })
+    }
+
+    // @Search Api
+    static async search_book(req, res, next) {
+        let search = {
+            where: {}
+        }
+        // Filters
+        req.query.s ? search.where.title = { [Op.like]: `%${req.query.s}%` } : ""
+        req.query.name ? search.where.author = { [Op.like]: `%${req.query.name}%` } : ""
+        req.query.type ? search.where.type = { [Op.like]: `%${req.query.type}%` } : ""
+
+        req.query.category ? search.where[Op.or] = [sequelize.fn('JSON_CONTAINS', sequelize.col('category'), `["${req.query.category}"]`)] : ""
+
+        // Pagination
+        search.limit = 10
+        search.offset = req.query.page ? (req.query.page - 1) * 10 : 0;
+
+        let books = await Book.findAll(search);
+
+        books = books.map(i => {
+            i.category = i.category.replace(/'/g, "")
+            i.category = JSON.parse(i.category)
+            i.image = `http://localhost:${process.env.PORT}/${i.image}`
+            return i
+        })
+
+        return res.status(200).send(books)
+
     }
 
     // @user

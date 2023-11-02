@@ -19,10 +19,10 @@ let auth = async (req, res, next) => {
             return next(error)
         }
     } else {
-        return res.send('token is invalid ')
-    }
-    if (!token) {
-        return res.send('token is not availabel')
+        return res.json({
+            status: "fail",
+            error: "token is invalid"
+        })
     }
 }
 

@@ -1,5 +1,5 @@
 const express = require('express')
-const { admin_add_book, admin_view_book, admin_update_book_details, admin_update_book_image, admin_book_delete, home_page, user_book_request, admin_book_request_view, admin_book_request, admin_book_new_request_view, admin_user_book_return, admin_all_user_fine_list, admin_user_fine, admin_update_fine_payment, user_fine } = require('../controller/book_controller')
+const { admin_add_book, admin_view_book, admin_update_book_details, admin_update_book_image, admin_book_delete, home_page, user_book_request, admin_book_request_view, admin_book_request, admin_book_new_request_view, admin_user_book_return, admin_all_user_fine_list, admin_user_fine, admin_update_fine_payment, user_fine, search_book, search_Category } = require('../controller/book_controller')
 const auth = require('../middleware/auth')
 const isAuthorize = require('../middleware/role')
 require('dotenv').config()
@@ -20,7 +20,8 @@ router.delete('/book/delete', auth, isAuthorize(permission), admin_book_delete)
 
 // @user
 router.get('/', home_page) //search feature is pending 
-
+// @user @Public
+router.get('/search', search_book)
 //                      Admin/User Book Request
 // @user
 router.post('/book/request', auth, user_book_request)

@@ -38,9 +38,9 @@ Book.init({
     },
     quantity: {
         type: DataTypes.INTEGER,
-        defaultValue:1
+        defaultValue: 1
     },
-    review: {
+    description: {
         type: DataTypes.STRING
     },
     image: {

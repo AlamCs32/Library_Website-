@@ -5,18 +5,17 @@ class Joi_service {
         let schema = joi.object({
             username: joi.string().min(1).required(),
             email: joi.string().min(1).email().required(),
-            password: joi.string().min(1).required(),
+            // password: joi.string().min(1).required(),
             roll_No: joi.number().min(1).required(),
             stream: joi.string().min(1).required(),
             field: joi.string().min(1).required(),
-            // year_stream: joi.date().required(),
             role: joi.string(),
             class: joi.string().min(1).required(),
             phone_no: joi.number().min(1).required()
         })
         let { error } = schema.validate(req, { abortEarly: false })
         if (error) {
-            return error = error.details.map(i => { return i.message })
+            return error
         }
         return false
     }
@@ -29,7 +28,7 @@ class Joi_service {
         let { error } = schema.validate(req, { abortEarly: false })
 
         if (error) {
-            return error = error.details.map(i => { return i.message })
+            return error
         }
         return false
     }
@@ -42,7 +41,7 @@ class Joi_service {
         let { error } = schema.validate(req, { abortEarly: false })
 
         if (error) {
-            return error = error.details.map(i => { return i.message })
+            return error
         }
         return false
     }
@@ -54,7 +53,7 @@ class Joi_service {
         })
         let { error } = Schema.validate(req.body, { abortEarly: false })
         if (error) {
-            return error = error.details.map(i => { return i.message })
+            return error
         }
         return false
     }
